@@ -26,7 +26,7 @@ model Book {
   id      String    @id @unique @default(cuid())
   title   String
   author  String
-  ISBN    String    @unique
+  ISBN    String
   genre   String
   imgUrl  String
   userId  String
