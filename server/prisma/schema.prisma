@@ -14,32 +14,35 @@ datasource db {
 }
 
 model User {
-  id       String    @id @unique @default(cuid())
-  fullname String
-  email    String    @unique
-  password String
-  books    Book[]
-  Reviews  Reviews[]
+  id        String    @id @unique @default(cuid())
+  fullname  String
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  books     Book[]
+  Reviews   Reviews[]
 }
 
 model Book {
-  id      String    @id @unique @default(cuid())
-  title   String
-  author  String
-  ISBN    String
-  genre   String
-  imgUrl  String
-  userId  String
-  user    User      @relation(fields: [userId], references: [id])
-  reviews Reviews[]
+  id        String    @id @unique @default(cuid())
+  title     String
+  author    String
+  ISBN      String
+  genre     String
+  imgUrl    String
+  userId    String
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+  reviews   Reviews[]
 }
 
 model Reviews {
-  id       String @id @unique @default(cuid())
-  feedback String
-  rating   Float
-  bookId   String
-  userId   String
-  book     Book   @relation(fields: [bookId], references: [id])
-  user     User   @relation(fields: [userId], references: [id])
+  id        String   @id @unique @default(cuid())
+  feedback  String
+  rating    Float
+  bookId    String
+  userId    String
+  createdAt DateTime @default(now())
+  book      Book     @relation(fields: [bookId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }

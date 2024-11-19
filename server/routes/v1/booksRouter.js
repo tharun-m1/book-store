@@ -91,18 +91,65 @@ booksRouter.patch("/update/:bookId", async (req, res, next) => {
 });
 
 booksRouter.get("/", async (req, res, next) => {
+  const userId = req.userId;
+  const { search, sortBy = "createdAt", order = "asc", genre } = req.query;
+
+  let sortField;
+
+  if (sortBy === "rating") {
+    sortField = {
+      reviews: {
+        _avg: { rating: order },
+      },
+    };
+  } else {
+    sortField = { [sortBy]: order };
+  }
+
   try {
-    const userId = req.userId;
+    // Build the search filter
+    const searchFilter = search
+      ? {
+          OR: [
+            { title: { contains: search, mode: "insensitive" } },
+            { author: { contains: search, mode: "insensitive" } },
+            { ISBN: { contains: search, mode: "insensitive" } },
+          ],
+        }
+      : {};
+
+    // Build the genre filter
+    const genreFilter = genre ? { genre } : {};
+
+    // Build the user filter
+    const userFilter = userId ? { userId } : {};
+
+    // Fetch books with combined filters
     const books = await prisma.book.findMany({
       where: {
-        userId,
+        AND: [searchFilter, genreFilter, userFilter],
+      },
+      orderBy: sortField,
+      include: {
+        reviews: {
+          select: { rating: true },
+        },
       },
     });
-    res.status(200).json({
-      books,
+
+    // Calculate average ratings
+    const booksWithRatings = books.map((book) => {
+      const ratings = book.reviews.map((r) => r.rating);
+      const avgRating =
+        ratings.length > 0
+          ? ratings.reduce((a, b) => a + b, 0) / ratings.length
+          : 0;
+      return { ...book, avgRating };
     });
+
+    res.status(200).json({ books: booksWithRatings });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     next(error);
   }
 });
