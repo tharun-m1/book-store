@@ -1,5 +1,7 @@
 const { z } = require("zod");
 
+// Using zod to validate input data
+
 const SignupSchema = z.object({
   fullname: z.string().min(2),
   email: z.string().email(),
@@ -34,6 +36,16 @@ const DeleteBookSchema = z.object({
 const GetBookSchema = z.object({
   bookId: z.string(),
 });
+
+const AddReviewSchema = z.object({
+  feedback: z.string().min(2),
+  rating: z.number().nonnegative().gte(1).lte(5),
+});
+
+const UpdateReviewSchema = z.object({
+  feedback: z.string().min(2).optional(),
+  rating: z.number().nonnegative().gte(1).lte(5).optional(),
+});
 module.exports = {
   SignupSchema,
   LoginSchema,
@@ -41,4 +53,6 @@ module.exports = {
   EditBookSchema,
   DeleteBookSchema,
   GetBookSchema,
+  AddReviewSchema,
+  UpdateReviewSchema,
 };

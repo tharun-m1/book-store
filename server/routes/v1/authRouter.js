@@ -12,6 +12,7 @@ authRouter.post("/signup", async (req, res, next) => {
     if (!parsedData.success) {
       return next(errorHandler(411, "Invalid Input"));
     }
+    // Checking if user already Exists.
     const exists = await prisma.user.findUnique({
       where: {
         email: parsedData.data.email,
@@ -20,6 +21,7 @@ authRouter.post("/signup", async (req, res, next) => {
     if (exists) {
       return next(errorHandler(403, "User already exists."));
     }
+    // Hashing password before saving.
     const encryptedPassword = await bcrypt.hash(parsedData.data.password, 10);
     await prisma.user.create({
       data: {
@@ -58,6 +60,7 @@ authRouter.post("/login", async (req, res, next) => {
     if (!passwordMatched) {
       return next(errorHandler(401, "Incorrect Password"));
     }
+    // Providing token to user for future authentication.
     const payload = {
       userId: user.id,
     };

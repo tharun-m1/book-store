@@ -6,6 +6,8 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const booksRouter = require("express").Router();
+
+// middleware to authenticate
 booksRouter.use(isLoggedIn);
 
 booksRouter.post("/add", async (req, res, next) => {
