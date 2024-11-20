@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: openSans;
+  src: url("./assets/fonts/OpenSans-VariableFont_wdth,wght.ttf");
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+.modal {
+  @apply fixed top-0 left-0 w-full h-full bg-[rgba(0,0,0,0.75)];
+}
