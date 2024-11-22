@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Header from "../components/Header";
 import { Outlet } from "react-router-dom";
 import AllModals from "../components/AllModals";
@@ -10,8 +10,17 @@ function AppLayout() {
       <div className="">
         <Header />
       </div>
+
       <div className="flex-1 overflow-y-hidden">
-        <Outlet />
+        <Suspense
+          fallback={
+            <div className="w-full h-full flex justify-center items-center font-semibold">
+              Loading...
+            </div>
+          }
+        >
+          <Outlet />
+        </Suspense>
       </div>
       <AllModals />
     </div>

@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import Login from "../components/Login";
 import SignUp from "../components/SignUp";
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
 function Auth() {
   const [activeTab, setActiveTab] = useState(0);
+  const token = useSelector((state) => state.auth.token);
+  if (token) {
+    return <Navigate to={"/home"} />;
+  }
   const renderForms = () => {
     if (activeTab === 0) {
       return <Login />;

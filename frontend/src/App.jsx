@@ -1,6 +1,8 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import AppLayout from "./Layout/AppLayout";
+import Protected from "./components/Protected";
+import { Toaster } from "react-hot-toast";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -8,6 +10,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 function App() {
   return (
     <>
+      <Toaster />
       <div className="">
         <Suspense
           fallback={
@@ -18,7 +21,7 @@ function App() {
         >
           <Routes>
             <Route path="/" element={<Auth />} />
-            <Route path="/home" element={<AppLayout />}>
+            <Route path="/home" element={<Protected Component={AppLayout} />}>
               <Route index element={<Dashboard />} />
             </Route>
           </Routes>
