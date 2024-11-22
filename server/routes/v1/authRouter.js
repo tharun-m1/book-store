@@ -12,6 +12,9 @@ authRouter.post("/signup", async (req, res, next) => {
     if (!parsedData.success) {
       return next(errorHandler(411, "Invalid Input"));
     }
+    if (parsedData.data.password !== parsedData.data.confirmPassword) {
+      return next(errorHandler(411, "Passwords doesn't match"));
+    }
     // Checking if user already Exists.
     const exists = await prisma.user.findUnique({
       where: {

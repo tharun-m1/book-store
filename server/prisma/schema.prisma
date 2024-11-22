@@ -27,7 +27,7 @@ model Book {
   id        String    @id @unique @default(cuid())
   title     String
   author    String
-  ISBN      String
+  isbn      String
   genre     String
   imgUrl    String
   userId    String
@@ -43,6 +43,6 @@ model Reviews {
   bookId    String
   userId    String
   createdAt DateTime @default(now())
-  book      Book     @relation(fields: [bookId], references: [id])
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id])
 }
