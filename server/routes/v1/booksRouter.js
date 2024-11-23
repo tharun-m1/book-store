@@ -169,6 +169,59 @@ booksRouter.get("/", async (req, res, next) => {
   }
 });
 
+booksRouter.get("/rec", async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    const books = await prisma.book.findMany({
+      where: {
+        userId: userId,
+      },
+    });
+    const ISBNs = books.map((book) => book.isbn);
+    const newBooks = await prisma.book.findMany({
+      where: {
+        AND: [{ userId: { not: userId } }, { isbn: { notIn: ISBNs } }],
+      },
+      take: 10,
+    });
+
+    const isbnForRating = newBooks.map((book) => book.isbn);
+    const reviewsForIsbns = await prisma.reviews.findMany({
+      where: { book: { isbn: { in: isbnForRating } } },
+      include: { book: { select: { isbn: true } } },
+    });
+
+    // Calculate average ratings
+    const isbnRatingMap = reviewsForIsbns.reduce((acc, review) => {
+      const isbn = review.book.isbn;
+      if (!acc[isbn]) acc[isbn] = [];
+      acc[isbn].push(review.rating);
+      return acc;
+    }, {});
+
+    const avgRatings = Object.fromEntries(
+      Object.entries(isbnRatingMap).map(([isbn, ratings]) => {
+        const avg =
+          ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
+        return [isbn, avg];
+      })
+    );
+
+    // Attach average ratings to books
+    const booksWithRatings = newBooks.map((book) => ({
+      ...book,
+      avgRating: avgRatings[book.isbn] || 0,
+    }));
+
+    res.status(200).json({
+      books: booksWithRatings,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
 booksRouter.get("/:bookId", async (req, res, next) => {
   try {
     const userId = req.userId;
