@@ -3,7 +3,7 @@ import Select from "react-select";
 import { genreOptions, orderOptions, sortByOptions } from "./options";
 import toast from "react-hot-toast";
 import { GetBooks } from "../api/book";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { set_books } from "../redux/bookStoreSlice";
 
 function SearchFilters() {
@@ -13,6 +13,7 @@ function SearchFilters() {
   const [sortBy, setSortBy] = useState(null);
   const [order, setOrder] = useState(null);
   const [genre, setGenre] = useState(null);
+  const token = useSelector((state) => state.auth.token);
 
   const debounce = (func, delay) => {
     return function (...args) {
@@ -26,8 +27,10 @@ function SearchFilters() {
   const handleChange = async (e) => {
     try {
       setSearch(e.target.value);
-      const books = await GetBooks(e.target.value);
-      dispatch(set_books(books));
+      if (token) {
+        const books = await GetBooks(e.target.value);
+        dispatch(set_books(books));
+      }
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
@@ -47,8 +50,10 @@ function SearchFilters() {
   };
 
   useEffect(() => {
-    fetchBooks();
-  }, [search, sortBy, order, genre]);
+    if (token) {
+      fetchBooks();
+    }
+  }, [search, sortBy, order, genre, token]);
 
   return (
     <div className="md:flex md:gap-2">

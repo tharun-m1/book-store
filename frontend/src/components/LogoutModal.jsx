@@ -11,7 +11,6 @@ function LogoutModal() {
     dispatch(close_logout());
   };
   const handleLogout = () => {
-    localStorage.clear();
     dispatch(initiate_user_data(null));
     dispatch(close_logout());
     return navigate("/");

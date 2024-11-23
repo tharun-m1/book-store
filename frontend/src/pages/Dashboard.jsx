@@ -31,7 +31,6 @@ function Dashboard() {
         navigate("/");
         return toast.error("Session expired");
       }
-
       toast.error(error.response.data.message);
       console.log(error);
     }
@@ -74,17 +73,23 @@ function Dashboard() {
             Your Books
           </div>
           <div className="max-h-[60vh] md:max-h-[60vh] lg:max-h-[75vh] overflow-y-scroll pb-[250px]">
-            <div className="mt-2 flex flex-wrap items-center justify-start gap-2">
-              {books?.map((book) => (
-                <div
-                  ref={bookRef}
-                  key={book?.id}
-                  className="w-full lg:w-[45%] xl:w-[30%] flex-shrink-0 shadow-xl"
-                >
-                  <BookCard book={book} status={"own"} />
-                </div>
-              ))}
-            </div>
+            {books?.length > 0 ? (
+              <div className="mt-2 flex flex-wrap items-center justify-start gap-2">
+                {books?.map((book) => (
+                  <div
+                    ref={bookRef}
+                    key={book?.id}
+                    className="w-full lg:w-[45%] xl:w-[30%] flex-shrink-0 shadow-xl"
+                  >
+                    <BookCard book={book} status={"own"} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="font-primary text-center text-[1.5rem] mt-[10%] font-semibold">
+                No books found, Add to see.
+              </div>
+            )}
           </div>
         </div>
         {/* )} */}
