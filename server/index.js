@@ -5,7 +5,11 @@ const router = require("./routes/v1/index");
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(express.json());
 
 app.use("/api/v1", router);
