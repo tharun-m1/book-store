@@ -3,28 +3,44 @@ import BookCard from "../components/BookCard";
 import toast from "react-hot-toast";
 
 import { useDispatch, useSelector } from "react-redux";
-import { set_books } from "../redux/bookStoreSlice";
-import { GetBooks } from "../api/book";
+import { set_books, set_recommendations } from "../redux/bookStoreSlice";
+import { GetBooks, Recommendations } from "../api/book";
+import { useNavigate } from "react-router-dom";
+import { remove_token } from "../redux/authSlice";
 
 function Dashboard() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const recRef = useRef(null);
   const bookRef = useRef(null);
   const books = useSelector((state) => state.bookStore.books);
-  const recomendedBooks = Array.from({ length: 0 }, (_, idx) => idx);
+  const token = useSelector((state) => state.auth.token);
+  const recomendedBooks = useSelector(
+    (state) => state.bookStore.recommendations
+  );
 
   const get_books = async () => {
     try {
       const books = await GetBooks();
+      const recommendations = await Recommendations();
       dispatch(set_books(books));
+      dispatch(set_recommendations(recommendations));
     } catch (error) {
+      if (error.response.data.message === "jwt expired") {
+        remove_token();
+        navigate("/");
+        return toast.error("Session expired");
+      }
+
       toast.error(error.response.data.message);
       console.log(error);
     }
   };
   useEffect(() => {
-    get_books();
-  }, []);
+    if (token) {
+      get_books();
+    }
+  }, [token]);
   return (
     <div className="p-2 h-full flex flex-col">
       {/* <div className="font-primary text-[1.5rem] font-semibold mt-5">
@@ -39,12 +55,13 @@ function Dashboard() {
               ref={recRef}
               className="lg:w-full lg:mx-auto mt-2 flex md:flex-col md:max-h-[60vh] lg:max-h-[75vh] items-center justify-start gap-2 overflow-x-scroll"
             >
-              {books.map((book) => (
+              {recomendedBooks?.map((book) => (
                 <div
                   ref={bookRef}
+                  key={book.id}
                   className="w-[260px] flex-shrink-0 shadow-xl"
                 >
-                  <BookCard status={"rec"} />
+                  <BookCard book={book} status={"rec"} />
                 </div>
               ))}
             </div>

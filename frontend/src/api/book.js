@@ -91,3 +91,12 @@ export const GetBooks = async (
     throw error;
   }
 };
+
+export const Recommendations = async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}/books/rec`, { headers: headers });
+    return res.data.books;
+  } catch (error) {
+    throw error;
+  }
+};

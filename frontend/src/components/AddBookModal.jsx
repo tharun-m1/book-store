@@ -2,17 +2,22 @@ import React, { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { close_book, set_edit_data } from "../redux/bookModalSlice";
+import {
+  close_book,
+  set_add_rec,
+  set_edit_data,
+} from "../redux/bookModalSlice";
 import { genreOptions } from "./options";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { Upload } from "../api/upload";
-import { AddBook, GetBooks, UpdateBook } from "../api/book";
-import { set_books } from "../redux/bookStoreSlice";
+import { AddBook, GetBooks, Recommendations, UpdateBook } from "../api/book";
+import { set_books, set_recommendations } from "../redux/bookStoreSlice";
 
 function AddBookModal() {
   const dispatch = useDispatch();
   const edit_data = useSelector((state) => state.bookModal.edit_data);
+  const rec_data = useSelector((state) => state.bookModal.add_rec);
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
   const [bookId, setBookId] = useState(null);
@@ -84,6 +89,10 @@ function AddBookModal() {
       await AddBook(formData);
       const books = await GetBooks();
       dispatch(set_books(books));
+      if (rec_data) {
+        const rec_books = await Recommendations();
+        dispatch(set_recommendations(rec_books));
+      }
       toast.success("Book Added");
       return dispatch(close_book());
     } catch (error) {
@@ -111,9 +120,21 @@ function AddBookModal() {
         feedback: edit_data?.feedback,
       });
     }
+    if (rec_data) {
+      setFormData({
+        title: rec_data?.title,
+        author: rec_data?.author,
+        isbn: rec_data?.isbn,
+        genre: rec_data?.genre,
+        image_url: rec_data?.image_url,
+        rating: "",
+        feedback: "",
+      });
+    }
 
     return () => {
       dispatch(set_edit_data(null));
+      dispatch(set_add_rec(null));
       setBookId(null);
       setReviewId(null);
     };

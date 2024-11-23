@@ -2,7 +2,7 @@ import React from "react";
 import { FaStar } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { open_delete, set_delete_data } from "../redux/deleteModalSlice";
-import { open_book, set_edit_data } from "../redux/bookModalSlice";
+import { open_book, set_add_rec, set_edit_data } from "../redux/bookModalSlice";
 
 function BookCard({ status, book }) {
   const dispatch = useDispatch();
@@ -24,6 +24,20 @@ function BookCard({ status, book }) {
       reviewId: book?.reviews[0]?.id,
     };
     dispatch(set_edit_data(payload));
+  };
+
+  const handleAddRecommended = () => {
+    dispatch(open_book());
+    const payload = {
+      title: book?.title,
+      author: book?.author,
+      isbn: book?.isbn,
+      genre: book?.genre,
+      image_url: book?.imgUrl,
+      rating: "",
+      feedback: "",
+    };
+    dispatch(set_add_rec(payload));
   };
   return (
     <div className="bg-white rounded-md p-2 flex gap-2 w-full font-primary">
@@ -52,7 +66,10 @@ function BookCard({ status, book }) {
         )}
         <div className="mt-auto">
           {status !== "own" && (
-            <button className="text-center w-full rounded-md bg-primary hover:bg-blue-800 text-white font-medium py-1">
+            <button
+              onClick={handleAddRecommended}
+              className="text-center w-full rounded-md bg-primary hover:bg-blue-800 text-white font-medium py-1"
+            >
               Add
             </button>
           )}
