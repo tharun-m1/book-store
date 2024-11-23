@@ -33,7 +33,7 @@ function SearchFilters() {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message);
+      if (error.response.status === 500) return toast.error("Server error");
     }
   };
   const debouncedSearch = debounce(handleChange, 500);
@@ -45,7 +45,6 @@ function SearchFilters() {
     } catch (error) {
       console.log(error);
       if (error.response.status === 500) return toast.error("Server error");
-      toast.error(error.response.data.message);
     }
   };
 
