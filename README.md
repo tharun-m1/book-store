@@ -131,11 +131,6 @@ Update the API base URL in `frontend/src/config.js`:
 export const BASE_URL = "http://localhost:4000/api/v1";
 ```
 
-## 📝 API Documentation
-
-The API endpoints are documented using Swagger UI and can be accessed at:
-`http://localhost:4000/api-docs` when the server is running.
-
 ## 🔒 Security
 
 - All passwords are hashed using bcrypt
