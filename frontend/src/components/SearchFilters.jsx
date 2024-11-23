@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Select from "react-select";
 import { genreOptions, orderOptions, sortByOptions } from "./options";
 import toast from "react-hot-toast";
@@ -17,79 +17,83 @@ function SearchFilters() {
 
   const debounce = (func, delay) => {
     return function (...args) {
-      const context = this;
       clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
-        func.apply(context, args);
+        func(...args);
       }, delay);
     };
   };
-  const handleChange = async (e) => {
-    try {
-      setSearch(e.target.value);
-      if (token) {
-        const books = await GetBooks(e.target.value);
-        dispatch(set_books(books));
-      }
-    } catch (error) {
-      console.log(error);
-      if (error.response.status === 500) return toast.error("Server error");
-    }
-  };
-  const debouncedSearch = debounce(handleChange, 500);
 
   const fetchBooks = async () => {
     try {
-      const books = await GetBooks(search, sortBy, order, genre);
-      dispatch(set_books(books));
+      if (token) {
+        const books = await GetBooks(search, sortBy, order, genre);
+        dispatch(set_books(books));
+      }
     } catch (error) {
-      console.log(error);
-      if (error.response.status === 500) return toast.error("Server error");
+      console.error(error);
+      if (error.response?.status === 500) return toast.error("Server error");
     }
   };
 
-  useEffect(() => {
-    if (token) {
-      fetchBooks();
-    }
-  }, [search, sortBy, order, genre, token]);
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearch(value);
+    debouncedFetchBooks(value);
+  };
+
+  const debouncedFetchBooks = debounce((value) => {
+    fetchBooks(value);
+  }, 500);
+
+  const handleSortByChange = (selectedOption) => {
+    setSortBy(selectedOption.value);
+    fetchBooks();
+  };
+
+  const handleOrderChange = (selectedOption) => {
+    setOrder(selectedOption.value);
+    fetchBooks();
+  };
+
+  const handleGenreChange = (selectedOption) => {
+    setGenre(selectedOption.value);
+    fetchBooks();
+  };
 
   return (
     <div className="md:flex md:gap-2">
       <div className="mt-2 md:flex-1">
         <input
-          onChange={(e) => {
-            setSearch(e.target.value);
-            debouncedSearch(e);
-          }}
+          onChange={handleSearchChange}
           value={search}
           type="text"
           placeholder="Search..."
           className="border border-gray-300 w-full h-full p-1 rounded-md px-2 focus:outline-none"
         />
       </div>
-      {/* filters */}
+      {/* Filters */}
       <div className="flex gap-1 justify-between mt-2 md:flex-1">
         {/* SortBy */}
         <Select
           value={sortByOptions.find((op) => op.value === sortBy)}
-          onChange={(selectedOption) => setSortBy(selectedOption.value)}
+          onChange={handleSortByChange}
           options={sortByOptions}
           className="flex-1"
-          placeholder={"Sort by"}
+          placeholder="Sort by"
         />
         {/* Order */}
         <Select
           value={orderOptions.find((op) => op.value === order)}
-          onChange={(selectedOption) => setOrder(selectedOption.value)}
+          onChange={handleOrderChange}
           options={orderOptions}
           className="flex-1"
-          placeholder={"Order"}
+          placeholder="Order"
         />
-        {/* genre */}
+        {/* Genre */}
         <Select
           value={genreOptions.find((op) => op.value === genre)}
-          onChange={(selectedOption) => setGenre(selectedOption.value)}
+          onChange={handleGenreChange}
           options={genreOptions}
           className="flex-1"
           placeholder="Genre"

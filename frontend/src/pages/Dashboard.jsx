@@ -13,10 +13,10 @@ function Dashboard() {
   const navigate = useNavigate();
   const recRef = useRef(null);
   const bookRef = useRef(null);
-  const books = useSelector((state) => state.bookStore.books);
-  const token = useSelector((state) => state.auth.token);
+  const books = useSelector((state) => state.bookStore?.books);
+  const token = useSelector((state) => state.auth?.token);
   const recomendedBooks = useSelector(
-    (state) => state.bookStore.recommendations
+    (state) => state.bookStore?.recommendations
   );
 
   const get_books = async () => {
